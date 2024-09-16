@@ -1,8 +1,8 @@
 package ru.tbank.dsl
 
-import org.slf4j.LoggerFactory
-import ru.tbank.dto.News
 import java.io.File
+import org.slf4j.LoggerFactory
+import ru.tbank.dto.NewsDTO
 
 class NewsPrinter {
 
@@ -16,14 +16,14 @@ class NewsPrinter {
         builder.append("\n\n")
     }
 
-    fun text(init: StringBuilder.() -> Unit) {
+    private fun text(init: StringBuilder.() -> Unit) {
         builder.init()
         builder.append("\n\n")
     }
 
-    fun bold(text: String) = "**$text**"
+    private fun bold(text: String) = "**$text**"
 
-    fun news(news: News) {
+    fun news(news: NewsDTO) {
         header(level = 3) { append(news.title) }
 
         val map = linkedMapOf(
