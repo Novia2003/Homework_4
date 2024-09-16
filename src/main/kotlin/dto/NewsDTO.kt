@@ -1,19 +1,19 @@
 package ru.tbank.dto
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.math.exp
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
-data class News(
+data class NewsDTO(
     val id: Long,
     @SerialName("publication_date")
     val publicationDate: Long,
     val title: String,
-    val place: Place? = null,
+    val place: PlaceDTO? = null,
     val description: String,
     @SerialName("site_url")
     val siteUrl: String,
