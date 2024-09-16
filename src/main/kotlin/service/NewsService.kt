@@ -1,27 +1,29 @@
 package ru.tbank.service
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.json.*
-import org.slf4j.LoggerFactory
-import ru.tbank.dto.News
-import ru.tbank.dto.Response
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.isSuccess
 import java.io.File
+import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
+import ru.tbank.dto.NewsDTO
+import ru.tbank.dto.ResponseDTO
 
 class NewsService {
 
     private val logger = LoggerFactory.getLogger(NewsService::class.java)
 
-    suspend fun getNews(count: Int = 100): List<News> {
+    suspend fun getNews(count: Int = 100): List<NewsDTO> {
         val client = HttpClient(CIO)
 
         return try {
             logger.info("Fetching news with count: $count")
 
-            val response: HttpResponse = client.get("https://kudago.com/public-api/v1.4/news/") {
+            val response: HttpResponse = client.get(URL) {
                 parameter("page_size", count)
                 parameter("order_by", "date")
                 parameter("location", "spb")
@@ -37,7 +39,7 @@ class NewsService {
 
             if (response.status.isSuccess()) {
                 logger.info("Successfully fetched news")
-                val newsResponse = json.decodeFromString<Response>(response.bodyAsText())
+                val newsResponse = json.decodeFromString<ResponseDTO>(response.bodyAsText())
 
                 newsResponse.results
             } else {
@@ -52,7 +54,7 @@ class NewsService {
         }
     }
 
-    fun saveNews(path: String, news: Collection<News>) {
+    fun saveNews(path: String, news: Collection<NewsDTO>) {
         if (path.isEmpty()) {
             logger.warn("File path is null or empty.")
             return
@@ -75,5 +77,9 @@ class NewsService {
         }
 
         logger.info("News saved to $path")
+    }
+
+    private companion object {
+        private const val URL = "https://kudago.com/public-api/v1.4/news/"
     }
 }
