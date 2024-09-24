@@ -1,6 +1,7 @@
 package ru.tbank.dsl
 
 import java.io.File
+import java.io.IOException
 import org.slf4j.LoggerFactory
 import ru.tbank.dto.NewsDTO
 
@@ -51,11 +52,15 @@ class NewsPrinter {
         val file = File(path)
         logger.info("Attempting to save news to $path")
 
-        file.bufferedWriter().use { writer ->
-            writer.write(builder.toString())
-        }
+        try {
+            file.bufferedWriter().use { writer ->
+                writer.write(builder.toString())
+            }
 
-        logger.info("News saved to $path")
+            logger.info("News saved to $path")
+        } catch (e: IOException) {
+            logger.error("Failed to save news to $path", e)
+        }
     }
 }
 

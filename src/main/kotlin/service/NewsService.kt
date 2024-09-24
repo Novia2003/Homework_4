@@ -8,6 +8,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import java.io.File
+import java.io.IOException
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import ru.tbank.dto.NewsDTO
@@ -68,15 +69,19 @@ class NewsService {
             throw IllegalArgumentException("File already exists at path: $path")
         }
 
-        file.bufferedWriter().use { writer ->
-            writer.write("id,date,title,place,description,siteUrl,favoritesCount,commentsCount,rating\n")
+        try {
+            file.bufferedWriter().use { writer ->
+                writer.write("id,date,title,place,description,siteUrl,favoritesCount,commentsCount,rating\n")
 
-            news.forEach { news ->
-                writer.write("${news.id},${news.date},${news.title},${news.place},${news.description},${news.siteUrl},${news.favoritesCount},${news.commentsCount},${news.rating}\n")
+                news.forEach { news ->
+                    writer.write("${news.id},${news.date},${news.title},${news.place},${news.description},${news.siteUrl},${news.favoritesCount},${news.commentsCount},${news.rating}\n")
+                }
             }
-        }
 
-        logger.info("News saved to $path")
+            logger.info("News saved to $path")
+        } catch (e: IOException) {
+            logger.error("Failed to save news to $path", e)
+        }
     }
 
     private companion object {
