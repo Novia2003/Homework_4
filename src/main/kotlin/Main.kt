@@ -1,5 +1,6 @@
 package ru.tbank
 
+import io.ktor.client.engine.cio.CIO
 import java.time.LocalDate
 import kotlin.time.Duration
 import kotlin.time.measureTimedValue
@@ -10,7 +11,7 @@ import ru.tbank.service.NewsService
 import ru.tbank.utils.getMostRatedNews
 
 fun main() = runBlocking {
-    val newsService = NewsService()
+    val newsService = NewsService(CIO.create())
 
     val (mostRatedNews: List<NewsDTO>, duration: Duration) = measureTimedValue {
         val newsList = newsService.getNews(count = 100)

@@ -1,7 +1,7 @@
 package ru.tbank.service
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
@@ -24,15 +24,15 @@ import org.slf4j.LoggerFactory
 import ru.tbank.dto.NewsDTO
 import ru.tbank.dto.ResponseDTO
 
-class NewsService {
+class NewsService(engine: HttpClientEngine) {
+
+    private val client = HttpClient(engine)
 
     private val logger = LoggerFactory.getLogger(NewsService::class.java)
 
     private val semaphore = Semaphore(MAX_CONCURRENT_REQUEST)
 
     suspend fun getNews(page: Int = 1, count: Int = 100): List<NewsDTO> {
-        val client = HttpClient(CIO)
-
         return try {
             logger.info("Fetching news with count: $count")
 
@@ -144,10 +144,10 @@ class NewsService {
         val file = File(path)
         logger.info("Attempting to save news to $path")
 
-//        if (file.exists()) {
-//            logger.error("File already exists at path: $path")
-//            throw IllegalArgumentException("File already exists at path: $path")
-//        }
+        if (file.exists()) {
+            logger.error("File already exists at path: $path")
+            throw IllegalArgumentException("File already exists at path: $path")
+        }
 
         try {
             file.bufferedWriter().use { writer ->
